@@ -121,7 +121,7 @@ document
     [prov:type = 'nidm:imageData',
     prov:type = 'prov:collection',
     prov:label = "Image data" %% xsd:string,
-    nidm:grandMeanScaling = "true" %%xsd:boolean,
+    nidm:grandMeanScaling = "true" %% xsd:boolean,
     nidm:targetBrainIntensity = "100" %% xsd:float,
     nidm:measuredMedianBrainIntensity = "115.32" %% xsd:float])
   used(niiri:model_fitting_id, niiri:image_data_id,-)
