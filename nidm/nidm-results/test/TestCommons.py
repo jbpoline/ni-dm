@@ -18,11 +18,12 @@ import signal
 import socket
 import ssl
 
-RELPATH = os.path.dirname(os.path.abspath(__file__))
+RELPATH = osp.dirname(os.path.abspath(__file__))
 
 # Append parent script directory to path
 sys.path.append(osp.join(RELPATH, os.pardir, os.pardir,
                              os.pardir, "scripts"))
+
 from Constants import NIDM_SOFTWARE_VERSION
 
 # Save debug info in a log file (debug.log)
@@ -31,18 +32,17 @@ logger = logging.getLogger(__name__)
 logger.info(' ---------- Debug log ----------')
 
 # Examples used for unit testing
-import_test_filenames = set([
+example_filenames = set([
               osp.join('spm', 'example001', 'example001_spm_results.provn'),
               osp.join('fsl', 'example001', 'fsl_nidm.provn') ])
 # All examples
-example_filenames = import_test_filenames.union(set([
+example_filenames = example_filenames | set([
               osp.join('spm', 'spm_results.provn') , 
               osp.join('spm', 'example002', 'spm_results_2contrasts.provn'),
               osp.join('spm', 'example003', 'spm_results_conjunction.provn'),
               osp.join('spm', 'example004', 'spm_inference_activities.provn'),
               osp.join('spm', 'example005', 'nidm.provn'),
-              osp.join('fsl', 'fsl_results.provn') ]))
-
+              osp.join('fsl', 'fsl_results.provn') ])
 
 # If True turtle file will be downloaded from the prov store using the address
 # specified in the README.  If False the turtle version will be retreived on
