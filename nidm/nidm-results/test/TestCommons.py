@@ -6,12 +6,13 @@
 '''
 
 import os
+import os.path as osp
 import sys
 import re
 import urllib2
 import rdflib
 from rdflib.graph import Graph
-from rdflib.compare import *
+from rdflib.compare import graph_diff, to_isomorphic
 import logging
 import signal
 import socket
@@ -20,7 +21,7 @@ import ssl
 RELPATH = os.path.dirname(os.path.abspath(__file__))
 
 # Append parent script directory to path
-sys.path.append(os.path.join(RELPATH, os.pardir, os.pardir,
+sys.path.append(osp.join(RELPATH, os.pardir, os.pardir,
                              os.pardir, "scripts"))
 from Constants import NIDM_SOFTWARE_VERSION
 
@@ -31,29 +32,34 @@ logger.info(' ---------- Debug log ----------')
 
 # Examples used for unit testing
 import_test_filenames = set([
-                                os.path.join('spm', 'example001', 'example001_spm_results.provn'),
-                                os.path.join('fsl', 'example001', 'fsl_nidm.provn')
-                            ])
+              osp.join('spm', 'example001', 'example001_spm_results.provn'),
+              osp.join('fsl', 'example001', 'fsl_nidm.provn') ])
 # All examples
 example_filenames = import_test_filenames.union(set([
-                                os.path.join('spm', 'spm_results.provn') , 
-                                os.path.join('spm', 'example002', 'spm_results_2contrasts.provn'),
-                                os.path.join('spm', 'example003', 'spm_results_conjunction.provn'),
-                                os.path.join('spm', 'example004', 'spm_inference_activities.provn'),
-                                os.path.join('spm', 'example005', 'nidm.provn'),
-                                os.path.join('fsl', 'fsl_results.provn')
-                            ]))
+              osp.join('spm', 'spm_results.provn') , 
+              osp.join('spm', 'example002', 'spm_results_2contrasts.provn'),
+              osp.join('spm', 'example003', 'spm_results_conjunction.provn'),
+              osp.join('spm', 'example004', 'spm_inference_activities.provn'),
+              osp.join('spm', 'example005', 'nidm.provn'),
+              osp.join('fsl', 'fsl_results.provn') ]))
 
 
-# If True turtle file will be downloaded from the prov store using the address specified in the README. 
-# If False the turtle version will be retreived on the fly using the prov translator. By default set to True
-# to check as README should be up to date but setting to False can be useful for local testing.
+# If True turtle file will be downloaded from the prov store using the address
+# specified in the README.  If False the turtle version will be retreived on
+# the fly using the prov translator. By default set to True to check as README
+# should be up to date but setting to False can be useful for local testing.
 ttl_from_readme = False
 
 def get_turtle(provn_file):
+    """
+    parameters
+    ----------
+    provn_file: str
+                The provn file name
+    """
     if ttl_from_readme:
         # Get URL of turtle from README file
-        readme_file = os.path.join(os.path.dirname(provn_file), 'README')
+        readme_file = osp.join(osp.dirname(provn_file), 'README')
         readme_file = open(readme_file, 'r')
         readme_txt = readme_file.read()
         turtle_search = re.compile(r'.*turtle: (?P<ttl_file>.*\.ttl).*')
@@ -121,6 +127,7 @@ def display_graph(diff_graph, prefix_msg="Difference in:"):
                             s_str = diff_graph.qname(s)
                         elif isinstance(s, rdflib.term.Literal):
                             s_str = s_str+" ("+str(s.datatype)+")"
+
                         p_str = str(p)
                         if isinstance(p, rdflib.term.URIRef) \
                             and not isinstance(p, rdflib.term.BNode):
